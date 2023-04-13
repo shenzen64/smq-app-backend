@@ -42,9 +42,6 @@ mongoose.connect(MONGOURL, {
   useUnifiedTopology: true,
 });
 
-mongoose.connection.on("connected", () => {
-  console.log("Connected succesfully");
-});
 
 
 
@@ -53,9 +50,16 @@ app.use(cors());
 app.use(NCRouter);
 
 
-
-
-
-app.listen(port, () => {
-  console.log("SERVER IS UP IN PORT " + port);
+mongoose.connection.on("connected", () => {
+  console.log("Connected succesfully");
+  app.listen(port, () => {
+    console.log("SERVER IS UP IN PORT " + port);
+  });
+  
 });
+
+
+
+
+
+
