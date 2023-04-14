@@ -1,12 +1,21 @@
 const express = require("express");
 const app = express();
+const https = require('https');
+const fs = require('fs');
 const cors = require("cors");
 const port = process.env.PORT || 9000;
 const mongoose = require("mongoose");
-const { MONGOURL } = require("./keys");
+const { MONGOURL,MDP,COOKIE_KEY } = require("./keys");
 const data = require("./data")
 const NCRouter = require("./routers/NC");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 const NC = require("./models/NC");
+const isAuthenticatedMiddleware = require("./middleware")
+const session = require('express-session')
+const MongoStore = require('connect-mongo');
+
+
 
 const load_process_data= async ()=> {
     // Iterate over the data and insert it into the db
@@ -46,20 +55,90 @@ mongoose.connect(MONGOURL, {
 
 
 app.use(express.json());
-app.use(cors());
-app.use(NCRouter);
+// Allow CORS for all routes
+app.use(cors({ credentials: true, origin: true }));
 
 
-mongoose.connection.on("connected", () => {
-  console.log("Connected succesfully");
-  app.listen(port, () => {
-    console.log("SERVER IS UP IN PORT " + port);
-  });
+// Configure passport to use local strategy
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    // Check if user's credentials are valid
+    if (username === "admin" && password === MDP) {
+      console.log("carré bienvenue");
+      
+      return done(null, { username });
+    } else {
+      console.log("incorrect password");
+      
+      return done(null, false, { message: "Mot de passe incorrect" });
+    }
+  }
+));
+
+// Serialize user into session cookie
+passport.serializeUser(function(user, done) {
+ 
   
+  done(null, user.username);
+});
+
+// Deserialize user from session cookie
+passport.deserializeUser((username, done) => {
+  const adminUsername = "admin";
+
+  if (username === adminUsername) {
+    done(null, { username: adminUsername });
+  } else {
+    done(new Error("User not found."));
+  }
 });
 
 
+// Set up authentication middleware
+app.use(session({
+  secret: COOKIE_KEY,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    sameSite: 'none',
+    secure: true,
+    maxAge: 24*60*60*1000 // 1 day
+  },  // using store session on MongoDB using express-session + connect
+  store: new MongoStore({
+    client: mongoose.connection.getClient(),
+    collection: 'sessions'
+  })
+}));
 
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(NCRouter);
+
+// Handle login request
+// Routes
+app.post("/login", passport.authenticate("local"), function(req, res) {
+  res.sendStatus(200);
+});
+
+// Example protected route
+app.get("/home", function(req, res) {
+  res.send("Welcome to the home page!");
+});
+
+
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
+mongoose.connection.on("connected", () => {
+  console.log("Connected succesfully");
+  https.createServer(options, app).listen(port, () => {
+    console.log('Server running at ' + port);
+  });
+  
+});
 
 
 
