@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-// const https = require('https');
-// const fs = require('fs');
+const https = require('https');
+const fs = require('fs');
 const cors = require("cors");
 const port = process.env.PORT || 9000;
 const mongoose = require("mongoose");
@@ -128,13 +128,13 @@ app.get("/home", function(req, res) {
 
 
 const options = {
-  // key: fs.readFileSync('key.pem'),
-  // cert: fs.readFileSync('cert.pem')
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
 };
 
 mongoose.connection.on("connected", () => {
   console.log("Connected succesfully");
-  app.listen(port, () => {
+  https.createServer(options,app).listen(port, () => {
     console.log('Server running at ' + port);
   });
   
