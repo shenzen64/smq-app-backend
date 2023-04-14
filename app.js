@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const https = require('https');
-const fs = require('fs');
+// const https = require('https');
+// const fs = require('fs');
 const cors = require("cors");
 const port = process.env.PORT || 9000;
 const mongoose = require("mongoose");
@@ -13,7 +13,6 @@ const LocalStrategy = require("passport-local").Strategy;
 const NC = require("./models/NC");
 const isAuthenticatedMiddleware = require("./middleware")
 const session = require('express-session')
-const MongoStore = require('connect-mongo');
 
 
 
@@ -103,11 +102,7 @@ app.use(session({
     sameSite: 'none',
     secure: true,
     maxAge: 24*60*60*1000 // 1 day
-  },  // using store session on MongoDB using express-session + connect
-  store: new MongoStore({
-    client: mongoose.connection.getClient(),
-    collection: 'sessions'
-  })
+  }
 }));
 
 
@@ -127,14 +122,14 @@ app.get("/home", function(req, res) {
 });
 
 
-const options = {
-  // key: fs.readFileSync('key.pem'),
-  // cert: fs.readFileSync('cert.pem')
-};
+// const options = {
+//   // key: fs.readFileSync('key.pem'),
+//   // cert: fs.readFileSync('cert.pem')
+// };
 
 mongoose.connection.on("connected", () => {
   console.log("Connected succesfully");
-  https.createServer(options, app).listen(port, () => {
+  app.listen(port, () => {
     console.log('Server running at ' + port);
   });
   
