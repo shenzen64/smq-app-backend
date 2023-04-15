@@ -100,8 +100,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     sameSite: 'none',
-    secure: false,
-    httpOnly: true,
+    secure: true,
     path: '/',
     maxAge: 24*60*60*1000 // 1 day
   },  // using store session on MongoDB using express-session + connect
