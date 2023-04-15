@@ -80,7 +80,7 @@ app.post("/login", async (req, res) => {
     
     const token = await generateAuthToken();
 
-    res.send({ token });
+    res.status(200).send({ token });
   } catch (e) {
     console.log(e);
     
