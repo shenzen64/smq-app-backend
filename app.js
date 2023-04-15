@@ -99,8 +99,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: 'none',
-    secure: true,
+    // sameSite: 'none',
+    secure: false,
     maxAge: 24*60*60*1000 // 1 day
   },  // using store session on MongoDB using express-session + connect
   // store: new MongoStore({
