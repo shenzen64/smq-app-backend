@@ -47,7 +47,10 @@ router.put("/updateNC/:id", requireAdmin,async (req, res) => {
   try {
     const nc = await NC.findByIdAndUpdate(req.params.id,{
       ...req.body.formData
+    }, {
+      new:true
     })
+    
     res.send(nc);
   } catch (e) {
     res.status(400).send(e);
