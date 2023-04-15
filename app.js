@@ -82,6 +82,8 @@ app.post("/login", async (req, res) => {
 
     res.send({ token });
   } catch (e) {
+    console.log(e);
+    
     res.status(400).json({
       error: "Failed to authenticate",
     });
