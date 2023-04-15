@@ -100,7 +100,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     sameSite: 'none',
-    secure: false,httpOnly:false,
+    secure: true,
+    domain:"www.epf-nc.web.app",
     maxAge: 24*60*60*1000 // 1 day
   },  // using store session on MongoDB using express-session + connect
   // store: new MongoStore({
