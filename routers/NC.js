@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const NC = require("../models/NC");
-const isAuthenticatedMiddleware = require("../middleware");
+const requireAdmin = require("../middleware");
 
-router.get("/allNC", isAuthenticatedMiddleware,async (req, res) => {
+router.get("/allNC", requireAdmin,async (req, res) => {
   
   try {
     const allNC = await NC.find({}).sort({ date_ouverture: 'desc' })
@@ -19,7 +19,7 @@ router.get("/allNC", isAuthenticatedMiddleware,async (req, res) => {
 
 
 // Add NC
-router.post("/createNC", isAuthenticatedMiddleware,async (req,res)=> {
+router.post("/createNC", requireAdmin,async (req,res)=> {
   try {
     console.log(req.body.formData);
     const numero = (await NC.find({})).length +1
@@ -42,7 +42,7 @@ router.post("/createNC", isAuthenticatedMiddleware,async (req,res)=> {
 })
 
 // Edit NC
-router.put("/updateNC/:id", isAuthenticatedMiddleware,async (req, res) => {
+router.put("/updateNC/:id", requireAdmin,async (req, res) => {
 
   try {
     const nc = await NC.findByIdAndUpdate(req.params.id,{

@@ -1,18 +1,13 @@
 const express = require("express");
 const app = express();
-// const https = require('https');
-// const fs = require('fs');
 const cors = require("cors");
 const port = process.env.PORT || 9000;
 const mongoose = require("mongoose");
-const { MONGOURL,MDP,COOKIE_KEY } = require("./keys");
+const { MONGOURL,MDP,JWT_SECRET } = require("./keys");
 const data = require("./data")
 const NCRouter = require("./routers/NC");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
 const NC = require("./models/NC");
-const session = require('express-session')
-// const MongoStore = require('connect-mongo');
+const jwt = require("jsonwebtoken")
 
 
 
@@ -55,70 +50,42 @@ mongoose.connect(MONGOURL, {
 
 app.use(express.json());
 // Allow CORS for all routes
-app.use(cors({ credentials: true, origin: true }));
-
-
-// Configure passport to use local strategy
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    // Check if user's credentials are valid
-    if (username === "admin" && password === MDP) {
-      console.log("carré bienvenue");
-      
-      return done(null, { username });
-    } else {
-      console.log("incorrect password");
-      
-      return done(null, false, { message: "Mot de passe incorrect" });
-    }
-  }
-));
-
-// Serialize user into session cookie
-passport.serializeUser(function(user, done) {
- 
-  
-  done(null, user.username);
-});
-
-// Deserialize user from session cookie
-passport.deserializeUser((username, done) => {
-  const adminUsername = "admin";
-
-  if (username === adminUsername) {
-    done(null, { username: adminUsername });
-  } else {
-    done(new Error("User not found."));
-  }
-});
-
-
-// Set up authentication middleware
-app.use(session({
-  secret: COOKIE_KEY,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    sameSite: 'none',
-    secure: true,
-    path: '/',
-    maxAge: 24*60*60*1000 // 1 day
-  },  // using store session on MongoDB using express-session + connect
-  // store: new MongoStore({
-  //   client: mongoose.connection.getClient(),
-  //   collection: 'sessions'
-  // })
-}));
-
-
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cors());
 app.use(NCRouter);
+
+
+const generateAuthToken = async function () {
+
+  const token = await jwt.sign({ username: "admin" }, JWT_SECRET);
+
+  
+  return token;
+};
 
 // Handle login request
 // Routes
-app.post("/login", passport.authenticate("local"), function(req, res) {
-  res.sendStatus(200);
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(422)
+        .json({ error: "Please provide an username and password" });
+    }
+    if(username!="admin" || password != MDP){
+      return res
+      .status(422)
+      .json({ error: "Incorrect Password" });
+    }
+    
+    const token = await generateAuthToken();
+
+    res.send({ token });
+  } catch (e) {
+    res.status(400).json({
+      error: "Failed to authenticate",
+    });
+  }
 });
 
 // Example protected route
