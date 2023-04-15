@@ -122,6 +122,8 @@ app.post("/login", passport.authenticate("local"), function(req, res) {
 
 // Example protected route
 app.get("/home", function(req, res) {
+  console.log("Testing purpose");
+  
   res.send("Welcome to the home page!");
 });
 
@@ -134,7 +136,7 @@ const options = {
 mongoose.connection.on("connected", () => {
   console.log("Connected succesfully");
   https.createServer(options,app).listen(port, () => {
-    console.log('Server running at ' + port);
+    console.log('Server is working i think in ' + port);
   });
   
 });
