@@ -11,9 +11,8 @@ const NCRouter = require("./routers/NC");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const NC = require("./models/NC");
-const isAuthenticatedMiddleware = require("./middleware")
 const session = require('express-session')
-const MongoStore = require('connect-mongo');
+// const MongoStore = require('connect-mongo');
 
 
 
@@ -104,10 +103,10 @@ app.use(session({
     secure: true,
     maxAge: 24*60*60*1000 // 1 day
   },  // using store session on MongoDB using express-session + connect
-  store: new MongoStore({
-    client: mongoose.connection.getClient(),
-    collection: 'sessions'
-  })
+  // store: new MongoStore({
+  //   client: mongoose.connection.getClient(),
+  //   collection: 'sessions'
+  // })
 }));
 
 
