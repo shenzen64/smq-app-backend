@@ -21,7 +21,6 @@ router.get("/allNC", requireAdmin,async (req, res) => {
 // Add NC
 router.post("/createNC", requireAdmin,async (req,res)=> {
   try {
-    console.log(req.body.formData);
     const numero = (await NC.find({})).length +1
     console.log('numero: ',numero);
     

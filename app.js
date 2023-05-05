@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { MONGOURL,MDP,JWT_SECRET } = require("./keys");
 const data = require("./data")
 const NCRouter = require("./routers/NC");
+const SolutionRouter = require("./routers/solution");
 const NC = require("./models/NC");
 const jwt = require("jsonwebtoken")
 
@@ -52,6 +53,7 @@ app.use(express.json());
 // Allow CORS for all routes
 app.use(cors());
 app.use(NCRouter);
+app.use(SolutionRouter);
 
 
 const generateAuthToken = async function () {
