@@ -56,4 +56,17 @@ router.put("/updateNC/:id", requireAdmin,async (req, res) => {
   }
 });
 
+// Delete NC
+router.delete("/delete/:id",requireAdmin,async (req,res)=>{
+  try {
+    const nc = await NC.findByIdAndDelete(req.params.id)
+    console.log(req.params.id);
+    res.send(nc)
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+})
+
 module.exports = router;

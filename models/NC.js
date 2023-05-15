@@ -49,6 +49,9 @@ const NCSchema = new mongoose.Schema({
   cout:{
     type: Number
   }, 
+  efficacite:{
+    type: String
+  }, 
   
 });
 
