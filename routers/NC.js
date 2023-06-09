@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const NC = require("../models/NC");
 const requireAdmin = require("../middleware");
-const ResultatNet = require("../models/ResultatNet")
+const ResultatNet = require("../models/ResultatNet");
+const PlanActions = require("../models/PlanActions");
 
 router.get("/allNC", requireAdmin,async (req, res) => {
   
@@ -102,5 +103,74 @@ router.delete("/delete/:id",requireAdmin,async (req,res)=>{
     
   }
 })
+
+// Get plan d'actions
+
+router.get("/planActions", requireAdmin,async (req, res) => {
+  
+  try {
+    const allActions= await PlanActions.find({})
+    
+    res.send(allActions);
+  } catch (error) {
+    res.send(404).json({
+      error: "Unable to found le plan d'actions",
+    });
+  }
+
+});
+
+// Update avncement Action
+router.put("/updateAvancement/:id",requireAdmin,async (req,res)=>{
+  try {
+    const action = await PlanActions.findByIdAndUpdate(req.params.id,{avancement:req.body.avancement}, {new:true})
+    res.send(action)
+
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+
+
+const data = [
+  {
+      action: "Ajouter une fiche contrôle qualité au dossier de fabrication",
+      avancement:100,
+      notes:"",
+      responsable:"A. Othmane"
+  },
+  {
+      action: "Création d’une défauthèque",
+      avancement:100,
+      responsable:"A. Othmane",
+      notes:""
+  },
+  {
+      action: "Implémenter une réunion qualité par mois",
+      notes:"",
+      responsable:"A. Othmane / Responsable qualité",
+  },
+  {
+      action: "Ajouter une fiche contrôle qualité au dossier de fabricationRequalification des caméras de contrôle qualité ",
+      avancement:50,
+      notes:"Qualité caméra insuffisante",
+      responsable: "A. Othmane / Responsable informatique"
+  },
+  {
+    action: "Implementation de système anti-erreur informatique",
+    avancement:25,
+    notes:"Contacter Pack-z",
+    responsable : "Responsable informatique"
+  }
+]
+
+const addPlanInitial = async ()=>{
+data.forEach(async (action)=>{
+  const a = new PlanActions({...action})
+  await a.save()
+})
+}
+// addPlanInitial()
 
 module.exports = router;
